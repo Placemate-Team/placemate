@@ -1,4 +1,4 @@
-# 🎓 PlaceMate — ANITS Placement & Code League Platform
+# 🎓 PlaceMate — ANITS Placement
 
 A full-stack MERN application for ANITS students, alumni, and faculty.
 
@@ -35,17 +35,7 @@ git clone https://github.com/placemate-org/placemate.git
 cd placemate
 ```
 
-### Step 2 — Set up MongoDB Atlas (one-time)
-1. Go to [mongodb.com/cloud/atlas](https://mongodb.com/cloud/atlas) → create a **free** account
-2. Create a new **Cluster** (free M0 tier)
-3. Under **Database Access** → Add a database user (username + password)
-4. Under **Network Access** → Add IP `0.0.0.0/0` (allow all) for development
-5. Click **Connect** → **Drivers** → copy the connection string:
-   ```
-   mongodb+srv://USERNAME:PASSWORD@cluster0.xxxxx.mongodb.net/placemate
-   ```
-
-### Step 3 — Configure environment variables
+### Step 2 — Configure environment variables
 
 **Backend:**
 ```bash
@@ -65,14 +55,8 @@ copy .env.example .env
 Open `frontend/.env` and set:
 - `VITE_GOOGLE_CLIENT_ID` → same Google client ID as above (or leave empty to skip Google login)
 
-### Step 4 — Google OAuth setup (optional but recommended)
-1. Go to [console.cloud.google.com](https://console.cloud.google.com)
-2. Create a project → **APIs & Services** → **Credentials** → **Create OAuth 2.0 Client ID**
-3. Application type: **Web application**
-4. Authorized JavaScript origins: `http://localhost:5173`
-5. Copy the **Client ID** → paste into both `.env` files
 
-### Step 5 — Install dependencies
+### Step 3 — Install dependencies
 
 ```bash
 # From project root
@@ -83,7 +67,7 @@ cd ../frontend
 npm install
 ```
 
-### Step 6 — Seed sample data (optional but recommended)
+### Step 4 — Seed sample data (optional but recommended)
 ```bash
 # Terminal 1 — Start backend first
 cd backend
@@ -98,7 +82,7 @@ node seed/seedDSA.js        # creates DSA sheet topics & problems
 node seed/seedContests.js   # creates sample contests
 ```
 
-### Step 7 — Run the app
+### Step 5 — Run the app
 
 Open **2 terminals**:
 
@@ -172,13 +156,3 @@ git push origin feature/your-feature-name
 ```
 
 ---
-
-## ❓ Troubleshooting
-
-| Problem | Fix |
-|---|---|
-| `MongooseError: connect ECONNREFUSED` | Check your `MONGO_URI` in `backend/.env` |
-| `Port 5000 already in use` | Change `PORT=5001` in `backend/.env` |
-| `VITE_API_URL` not working | Make sure `frontend/.env` has `VITE_API_URL=http://localhost:5000` |
-| Google login not working | Set `VITE_GOOGLE_CLIENT_ID` and add `http://localhost:5173` to Google Console origins |
-| `node_modules` errors | Delete `node_modules` folder and run `npm install` again |

@@ -7,6 +7,9 @@ import connectDB from './config/db.js';
 import authRoutes from './routes/auth.js';
 import dsaRoutes from './routes/dsaSheet.js';
 import contestRoutes from './routes/contests.js';
+import leaderboardRoutes from './routes/leaderboards.js';
+import placementStoriesRoutes from './routes/placementStories.js';
+import opportunitiesRoutes from './routes/opportunities.js';
 
 dotenv.config();
 connectDB();
@@ -42,6 +45,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/code-league', dsaRoutes);
 app.use('/api/admin', dsaRoutes); // batch-guidance endpoint
 app.use('/api', contestRoutes);
+app.use('/api/leaderboards', leaderboardRoutes);
+app.use('/api/placement-stories', placementStoriesRoutes);
+app.use('/api/opportunities', opportunitiesRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => {

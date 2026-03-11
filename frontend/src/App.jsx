@@ -9,6 +9,9 @@ import Dashboard from './pages/Dashboard';
 import NotFound from './pages/NotFound';
 import DSASheet from './pages/DSASheet';
 import Contests from './pages/Contests';
+import Leaderboards from './pages/Leaderboards';
+import PlacementStories from './pages/PlacementStories';
+import Opportunities from './pages/Opportunities';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
@@ -60,6 +63,18 @@ const router = createBrowserRouter([
       {
         path: '/contests',
         element: <Contests />,
+      },
+      {
+        path: '/leaderboards',
+        element: <Leaderboards />,
+      },
+      {
+        path: '/placement-stories',
+        element: <PlacementStories />,
+      },
+      {
+        path: '/opportunities',
+        element: <Opportunities />,
       },
       {
         path: '/',

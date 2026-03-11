@@ -6,7 +6,7 @@ import Contest from '../models/Contest.js';
 import Registration from '../models/Registration.js';
 import Score from '../models/Score.js';
 import User from '../models/User.js';
-import DSA from '../models/DSA.js';
+import { DSALevel, UserDSAProgress } from '../models/DSA.js';
 import { verifyToken, requireRole } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -115,19 +115,25 @@ router.get('/user/eligibility', verifyToken, async (req, res) => {
 
         // For monthly contests — check 75% DSA completion for Ignite
         if (role === 'Ignite' || role === 'Coordinator' || role === 'Admin') {
-            const dsaData = await DSA.findOne({}).lean();
-            if (!dsaData) return res.json({ eligible: true });
+            // Coordinators and Admins are always eligible
+            if (role === 'Coordinator' || role === 'Admin') {
+                return res.json({ eligible: true, dsaPct: 100 });
+            }
 
-            // Count total problems
-            const totalProblems = dsaData.levels?.reduce((acc, lv) =>
+            // Count total problems across all DSA levels
+            const allLevels = await DSALevel.find().lean();
+            const totalProblems = allLevels.reduce((acc, lv) =>
                 acc + lv.topics.reduce((a, t) => a + t.problems.length, 0), 0
-            ) || 0;
+            );
 
-            const userDoc = await User.findById(req.user._id).select('completedProblems');
-            const completedCount = userDoc?.completedProblems?.length || 0;
-            const pct = totalProblems > 0 ? Math.round((completedCount / totalProblems) * 100) : 0;
+            if (totalProblems === 0) return res.json({ eligible: true });
 
-            if (pct >= 75 || role === 'Coordinator' || role === 'Admin') {
+            // Get user's completed problems from their progress doc
+            const progressDoc = await UserDSAProgress.findOne({ userId: req.user._id }).lean();
+            const completedCount = progressDoc?.completedProblems?.length || 0;
+            const pct = Math.round((completedCount / totalProblems) * 100);
+
+            if (pct >= 75) {
                 return res.json({ eligible: true, dsaPct: pct });
             }
 

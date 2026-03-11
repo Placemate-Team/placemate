@@ -3,7 +3,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard, User, Briefcase, Bell, LogOut,
     ChevronDown, Menu, X, GraduationCap, Users,
-    Settings, Award, Search, Code2, Trophy,
+    Settings, Award, Search, Code2, Trophy, BarChart2, BookOpen, Zap,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -21,6 +21,9 @@ const NAV = [
     { to: '/profile', icon: User, label: 'Profile' },
     { to: '/jobs', icon: Briefcase, label: 'Jobs' },
     { to: '/contests', icon: Trophy, label: 'Contests' },
+    { to: '/leaderboards', icon: BarChart2, label: 'Leaderboards' },
+    { to: '/placement-stories', icon: BookOpen, label: 'Placement Stories' },
+    { to: '/opportunities', icon: Zap, label: 'Opportunities' },
     { to: '/code-league/dsa-sheet', icon: Code2, label: 'DSA Sheet', roles: ['Ignite', 'Coordinator', 'Admin'] },
     { to: '/students', icon: GraduationCap, label: 'Students', roles: ['Faculty', 'Coordinator', 'Admin'] },
     { to: '/team', icon: Users, label: 'Team', roles: ['Coordinator', 'Admin'] },

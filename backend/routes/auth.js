@@ -295,6 +295,76 @@ router.post('/complete-profile', verifyToken, async (req, res) => {
     }
 });
 
+// GET /api/auth/dev-login — By-pass authentication for local development
+router.post('/dev-login', async (req, res) => {
+    try {
+        const email = 'dev_user@anits.edu.in';
+        let user = await User.findOne({ email });
+        
+        if (!user) {
+            user = await User.create({
+                email,
+                name: 'Dev User',
+                role: 'Ignite',
+                profileComplete: true,
+                status: 'active',
+            });
+        }
+        
+        user.lastLogin = new Date();
+        await user.save({ validateBeforeSave: false });
+
+        const token = generateToken(user._id);
+        res.json({
+            message: 'Dev bypass sign-in successful.',
+            token,
+            user: user.toJSON(),
+            profileComplete: user.profileComplete
+        });
+    } catch (error) {
+        console.error('[Dev Login Error]', error.message);
+        res.status(500).json({ message: 'Dev authentication failed.' });
+    }
+});
+
+// PUT /api/auth/profile — update existing user profile
+router.put('/profile', verifyToken, async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const data = req.body;
+        
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ message: 'User not found.' });
+
+        // Selectively update fields based on what was sent, keeping role and email locked
+        const allowedUpdates = [
+            'name', 'nickname', 'phone', 'linkedIn', 
+            'rollNumber', 'branch', 'batch', 'college',
+            'placedCompany', 'currentCompany', 'currentDesignation',
+            'department', 'designation', 'yearsOfExperience', 'employeeId'
+        ];
+
+        allowedUpdates.forEach(field => {
+            if (data[field] !== undefined) {
+                user[field] = data[field];
+            }
+        });
+
+        await user.save({ validateBeforeSave: false });
+
+        // Need to issue a new token? Usually not necessary unless token contains the updated payload
+        // But our token just contains { id: userId }, so the same token remains valid.
+        
+        res.json({
+            message: 'Profile updated successfully.',
+            user: user.toJSON()
+        });
+    } catch (error) {
+        console.error('[Update Profile Error]', error.message);
+        res.status(500).json({ message: 'Server error updating profile.' });
+    }
+});
+
 // GET /api/auth/check-email — check if email exists and profile status
 router.get('/check-email', async (req, res) => {
     try {

@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+
+const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
 import {
     GraduationCap, Briefcase, Users, BarChart2,
     ArrowRight, CheckCircle, ChevronRight, Zap,
@@ -39,8 +41,8 @@ export default function Landing() {
                         <span className="hidden sm:inline ml-0.5 text-[10px] font-bold text-gray-300 uppercase tracking-[.15em]">· ANITS</span>
                     </div>
                     <div className="flex items-center gap-2 animate-fade-in">
-                        <Link to="/auth" className="btn-ghost text-sm">Login</Link>
-                        <Link to="/auth?tab=register" className="btn-primary text-sm px-5 py-2">
+                        <Link to={DEV_MODE ? '/dashboard' : '/auth'} className="btn-ghost text-sm">Login</Link>
+                        <Link to={DEV_MODE ? '/dashboard' : '/auth?tab=register'} className="btn-primary text-sm px-5 py-2">
                             Get Started <ArrowRight size={14} />
                         </Link>
                     </div>
@@ -72,10 +74,10 @@ export default function Landing() {
 
                 {/* CTAs */}
                 <div className="animate-fade-up [animation-delay:.15s] flex flex-col sm:flex-row items-center gap-3 mb-16">
-                    <Link to="/auth?tab=register" className="btn-primary text-base px-8 py-3 rounded-2xl">
+                    <Link to={DEV_MODE ? '/dashboard' : '/auth?tab=register'} className="btn-primary text-base px-8 py-3 rounded-2xl">
                         Start Free <ArrowRight size={18} />
                     </Link>
-                    <Link to="/auth" className="btn-secondary text-base px-8 py-3 rounded-2xl">
+                    <Link to={DEV_MODE ? '/dashboard' : '/auth'} className="btn-secondary text-base px-8 py-3 rounded-2xl">
                         Login to Portal
                     </Link>
                 </div>
@@ -118,7 +120,7 @@ export default function Landing() {
                             </li>
                         ))}
                     </ul>
-                    <Link to="/auth?tab=register" className="btn-primary w-full py-3 rounded-2xl text-base">
+                    <Link to={DEV_MODE ? '/dashboard' : '/auth?tab=register'} className="btn-primary w-full py-3 rounded-2xl text-base">
                         Join PlaceMate <ChevronRight size={17} />
                     </Link>
                 </div>

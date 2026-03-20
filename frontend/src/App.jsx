@@ -14,6 +14,7 @@ import PlacementStories from './pages/PlacementStories';
 import Opportunities from './pages/Opportunities';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
 
 const router = createBrowserRouter([
   {
@@ -22,7 +23,8 @@ const router = createBrowserRouter([
   },
   {
     path: '/auth',
-    element: <Auth />,
+    // In dev mode: skip login entirely, go straight to dashboard
+    element: DEV_MODE ? <Navigate to="/dashboard" replace /> : <Auth />,
   },
   {
     // Protected area — requires auth, wrapped in Layout (header + sidebar)

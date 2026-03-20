@@ -1,6 +1,8 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
+
 /**
  * ProtectedRoute — wraps any element that requires authentication.
  * @param {React.ReactNode} children
@@ -9,6 +11,9 @@ import { useAuth } from '../context/AuthContext';
 const ProtectedRoute = ({ children, roles }) => {
     const { user, loading } = useAuth();
     const location = useLocation();
+
+    // In dev mode — always allow access, skip all auth checks
+    if (DEV_MODE) return children;
 
     // Show nothing while bootstrapping token
     if (loading) {

@@ -3,7 +3,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard, User, Briefcase, Bell, LogOut,
     ChevronDown, Menu, X, GraduationCap, Users,
-    Settings, Award, Search, Code2, Trophy, BarChart2, BookOpen, Zap,
+    Settings, Award, Search, Code2, Trophy, BarChart2, BookOpen, Zap, Shuffle,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -15,6 +15,8 @@ const ROLE_BADGE_STYLE = {
     Coordinator: { bg: '#EFF6FF', color: '#1D4ED8', border: '#BFDBFE' },
     Admin: { bg: '#E0F8FF', color: '#007FAA', border: '#b3e9ff' },
 };
+
+const DEV_ROLES = ['Ignite', 'Spark', 'Alumni', 'Faculty', 'Coordinator', 'Admin'];
 
 const NAV = [
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -30,20 +32,45 @@ const NAV = [
     { to: '/settings', icon: Settings, label: 'Settings', roles: ['Admin'] },
 ];
 
+// Simple toast shown in the top-right corner
+function RoleToast({ role, onDone }) {
+    const style = ROLE_BADGE_STYLE[role] || ROLE_BADGE_STYLE.Admin;
+    return (
+        <div
+            className="fixed top-4 right-4 z-[9999] flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-lg border text-sm font-semibold animate-scale-in"
+            style={{ background: style.bg, color: style.color, borderColor: style.border }}
+            onAnimationEnd={() => setTimeout(onDone, 1800)}
+        >
+            <Shuffle size={14} />
+            Role switched to <strong>{role}</strong>
+        </div>
+    );
+}
+
 export default function Layout() {
-    const { user, logout } = useAuth();
+    const { user, logout, switchRole, devMode } = useAuth();
     const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
     const [notifOpen, setNotifOpen] = useState(false);
+    const [toast, setToast] = useState(null);
 
-    const handleLogout = () => { logout(); navigate('/auth'); };
+    const handleLogout = () => { logout(); if (!devMode) navigate('/auth'); };
     const visibleLinks = NAV.filter((l) => !l.roles || l.roles.includes(user?.role));
     const initials = user?.name?.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || '??';
     const roleStyle = ROLE_BADGE_STYLE[user?.role] || ROLE_BADGE_STYLE.Admin;
 
+    const handleRoleSwitch = (role) => {
+        switchRole(role);
+        setToast(role);
+        setProfileOpen(false);
+    };
+
     return (
         <div className="flex h-screen overflow-hidden bg-gray-50/60">
+
+            {/* ── Dev Role Toast ── */}
+            {toast && <RoleToast role={toast} onDone={() => setToast(null)} />}
 
             {/* ── Mobile overlay ── */}
             {sidebarOpen && (
@@ -169,7 +196,7 @@ export default function Layout() {
                             </button>
 
                             {profileOpen && (
-                                <div className="absolute right-0 top-full mt-2 w-52 card p-1.5 z-50 animate-scale-in">
+                                <div className="absolute right-0 top-full mt-2 w-56 card p-1.5 z-50 animate-scale-in">
                                     <div className="px-3 py-2 mb-1">
                                         <p className="text-xs font-semibold text-gray-800 truncate">{user?.name}</p>
                                         <p className="text-[11px] text-gray-400 truncate">{user?.email}</p>
@@ -183,10 +210,44 @@ export default function Layout() {
                                         className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-colors flex items-center gap-2">
                                         <Settings size={14} className="text-gray-400" /> Settings
                                     </button>
+
+                                    {/* ── Dev Mode Role Switcher ── */}
+                                    {devMode && (
+                                        <>
+                                            <hr className="border-gray-100 mx-1 my-1" />
+                                            <div className="px-3 py-1.5">
+                                                <p className="text-[10px] font-bold text-gray-300 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                                                    <Shuffle size={10} /> Switch Role (Dev)
+                                                </p>
+                                                <div className="grid grid-cols-2 gap-1">
+                                                    {DEV_ROLES.map((role) => {
+                                                        const rs = ROLE_BADGE_STYLE[role];
+                                                        const isActive = user?.role === role;
+                                                        return (
+                                                            <button
+                                                                key={role}
+                                                                onClick={() => handleRoleSwitch(role)}
+                                                                className="px-2 py-1 rounded-lg text-[11px] font-semibold transition-all duration-150 border"
+                                                                style={{
+                                                                    background: isActive ? rs.bg : 'transparent',
+                                                                    color: isActive ? rs.color : '#9ca3af',
+                                                                    borderColor: isActive ? rs.border : 'transparent',
+                                                                    fontWeight: isActive ? 700 : 500,
+                                                                }}
+                                                            >
+                                                                {role}
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+
                                     <hr className="border-gray-100 mx-1 my-1" />
                                     <button onClick={handleLogout}
                                         className="w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-red-50 rounded-xl transition-colors flex items-center gap-2">
-                                        <LogOut size={14} /> Sign Out
+                                        <LogOut size={14} /> {devMode ? 'Reset Dev User' : 'Sign Out'}
                                     </button>
                                 </div>
                             )}

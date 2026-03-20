@@ -3,10 +3,24 @@ import axios from 'axios';
 
 const AuthContext = createContext(null);
 
+const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
+
+const DEV_USER = {
+    _id: 'dev-user',
+    email: 'dev@anits.edu.in',
+    role: 'Ignite',
+    name: 'Dev User',
+    nickname: 'DevNick',
+    batch: '2025-2029',
+    branch: 'CSE',
+    profileComplete: true,
+    isCodeLeagueRegistered: true,
+};
+
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(DEV_MODE ? DEV_USER : null);
     const [token, setToken] = useState(() => localStorage.getItem('pm_token'));
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(!DEV_MODE); // In dev mode, no loading needed
 
     // Axios base defaults
     axios.defaults.baseURL = '/api';
@@ -20,8 +34,10 @@ export const AuthProvider = ({ children }) => {
         }
     }, [token]);
 
-    // Bootstrap — reload user from /me on page refresh
+    // Bootstrap — reload user from /me on page refresh (skipped in dev mode)
     useEffect(() => {
+        if (DEV_MODE) return; // Skip real auth bootstrap in dev mode
+
         const bootstrap = async () => {
             if (!token) { setLoading(false); return; }
             try {
@@ -38,6 +54,13 @@ export const AuthProvider = ({ children }) => {
         };
         bootstrap();
     }, [token]);
+
+    // DEV MODE: switch role instantly
+    const switchRole = useCallback((newRole) => {
+        if (!DEV_MODE) return;
+        setUser((prev) => ({ ...prev, role: newRole }));
+        localStorage.setItem('pm_dev_role', newRole);
+    }, []);
 
     // Legacy email/password login
     const login = useCallback(async (email, password) => {
@@ -63,6 +86,11 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const logout = useCallback(() => {
+        if (DEV_MODE) {
+            // In dev mode, reset to default dev user
+            setUser(DEV_USER);
+            return;
+        }
         localStorage.removeItem('pm_token');
         setToken(null);
         setUser(null);
@@ -70,7 +98,7 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     return (
-        <AuthContext.Provider value={{ user, token, loading, login, register, logout, setUserFromGoogle }}>
+        <AuthContext.Provider value={{ user, token, loading, login, register, logout, setUserFromGoogle, switchRole, devMode: DEV_MODE }}>
             {children}
         </AuthContext.Provider>
     );

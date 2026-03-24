@@ -6,6 +6,7 @@ import Layout from './components/Layout';
 import Landing from './pages/Landing';
 import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
+import Profile from './pages/Profile';
 import NotFound from './pages/NotFound';
 import DSASheet from './pages/DSASheet';
 import Contests from './pages/Contests';
@@ -40,7 +41,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/profile',
-        element: <div className="card p-8 text-center text-gray-400">Profile page — coming soon</div>,
+        element: <Profile />,
       },
       {
         path: '/jobs',
